@@ -23,7 +23,7 @@ router.post('/oauth', function(req, res, next) {
   if (secret != req.body.client_secret) {
       res.status(403).send({ error: 'Bad secret' });
   } else {
-    User.findOne({ name: req.body.name }, function(err, user) {
+    User.findOne({ email: req.body.name }, function(err, user) {
         if (err) throw err;
         if (!user) {
             res.send("User not found!");
