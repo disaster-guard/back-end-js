@@ -20,7 +20,7 @@ router.post('/register', function(req, res, next) {
 });
 
 router.post('/oauth', function(req, res, next) {
-  if (secret != req.body.client_secret) {
+  if (secret !== req.body.client_secret) {
       res.status(403).send({ error: 'Bad secret' });
   } else {
     User.findOne({ email: req.body.name }, function(err, user) {
@@ -32,11 +32,14 @@ router.post('/oauth', function(req, res, next) {
             if (user.password != req.body.password) {
                 res.json({ success: false, message: 'Authentication failed. Wrong password.' });
             } else {
-                res.json({access_token: "123-456", token_type:'*', expires_in: 1000});
+                const uuidV4 = require('uuid/v4');
+                res.json({access_token: uuidV4(), token_type:'*', expires_in: 1000});
             }
         }
     });
   }
 });
+
+router.post
 
 module.exports = router;
