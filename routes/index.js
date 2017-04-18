@@ -97,4 +97,19 @@ router.get('/api/nearbyProfile', function(req, res, next) {
     });
 });
 
+router.get('/getPredictionModel', function(req, res, next) {
+
+    // TODO: get photo based on request's user ID
+    var photoFile = 'photo.jpg';
+
+    var options = {
+        mode: 'text',
+        args: [photoFile, config.clarifaiId, config.clarifaiSecret]
+    };
+    PythonShell.run('predict.py', options, function (err, results) {
+        if (err) throw err;
+        res.json(JSON.parse(results[0]));
+    });
+});
+
 module.exports = router;
