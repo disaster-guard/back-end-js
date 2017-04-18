@@ -4,6 +4,8 @@ var User = require('./models/user');
 var Flare = require('./models/position');
 
 var secret = "p7lrAtXIa15549Qq5a8gGNoOzuVwYRQfOYTcMWyh";
+// TODO: replace hard-coded UUID with a dynamic UUID functional NPM package
+var tokenValue = "123-456";
 
 router.post('/register', function(req, res, next) {
   var user = new User();
@@ -33,8 +35,7 @@ router.post('/oauth', function(req, res, next) {
             if (user.password != req.body.password) {
                 res.json({ success: false, message: 'Authentication failed. Wrong password.' });
             } else {
-                // TODO: replace hard-coded UUID with a dynamic UUID functional NPM package
-                res.json({access_token: "123-456", token_type:'*', expires_in: 1000});
+                res.json({access_token: tokenValue, token_type:'*', expires_in: 1000});
             }
         }
     });
@@ -47,8 +48,7 @@ router.post('/api/flare', function(req, res, next) {
     flare.longitude = req.body.longitude;
     flare.latitude = req.body.lat;
     flare.userId = req.body.user_id;
-    // TODO: replace hard-coded UUID with a dynamic UUID functional NPM package
-    if (req.get("Authorization") !== "123-456") {
+    if (req.get("Authorization") !== tokenValue) {
         return res.status(403).send({error: 'Bad auth header'});
     }
     flare.save(function(err) {
@@ -56,6 +56,25 @@ router.post('/api/flare', function(req, res, next) {
             res.send(err);
         } else {
             res.json({status:"flare saved successfully"});
+        }
+    });
+});
+
+router.post('/api/getUserId', function(req, res, next) {
+    if (req.get("Authorization") !== tokenValue) {
+        return res.status(403).send({error: 'Bad auth header'});
+    }
+    User.findOne({ email: req.body.email }, function(err, user) {
+        if (err) throw err;
+        if (!user) {
+            res.send("User not found!");
+        } else if (user) {
+            // check if password matches
+            if (user.user_id == null) {
+                res.json({ success: false, message: 'bad token.' });
+            } else {
+                res.json({user_id: user.user_id});
+            }
         }
     });
 });
