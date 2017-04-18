@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
+var config = require('../../config');
 var Schema 	 = mongoose.Schema;
 mongoose.Promise = global.Promise;
 var autoIncrement = require('mongoose-auto-increment');
-var connection = mongoose.createConnection("mongodb://localhost/disaster-guard");
+var connection = mongoose.createConnection(config.database);
 autoIncrement.initialize(connection);
 
 var userSchema = new Schema({

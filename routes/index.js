@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var config = require('../config');
+var PythonShell = require('python-shell');
 var User = require('./models/user');
 var Flare = require('./models/position');
 
-var secret = "p7lrAtXIa15549Qq5a8gGNoOzuVwYRQfOYTcMWyh";
+var secret = config.secret;
 // TODO: replace hard-coded UUID with a dynamic UUID functional NPM package
 var tokenValue = "123-456";
 
@@ -44,7 +46,6 @@ router.post('/oauth', function(req, res, next) {
 
 router.post('/api/flare', function(req, res, next) {
     var flare = new Flare();
-    console.log(req.body);
     flare.longitude = req.body.longitude;
     flare.latitude = req.body.lat;
     flare.userId = req.body.user_id;
