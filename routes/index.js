@@ -79,4 +79,21 @@ router.post('/api/getUserId', function(req, res, next) {
     });
 });
 
+router.get('/api/nearbyProfile', function(req, res, next) {
+    var picture = "http://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg";
+    User.findOne({ email: req.param("email") }, function(err, user) {
+        if (err) throw err;
+        if (!user) {
+            res.send("User not found!");
+        } else if (user) {
+            // check if password matches
+            if (user.email == null) {
+                res.json({ success: false, message: 'User not found.' });
+            } else {
+                res.json({name: user.name, picture: picture});
+            }
+        }
+    });
+});
+
 module.exports = router;
