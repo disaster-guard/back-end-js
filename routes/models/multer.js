@@ -5,11 +5,11 @@ var storage = multer.diskStorage({
         cb(null, './images');
     },
     filename: function (req, file, cb) {
-        var ext = file.mimetype;
+        var ext = file.originalname;
         var extStr = "";
-        if (ext === 'image/jpeg') {
+        if (ext.match(".jpg$")) {
             extStr = ".jpg"
-        } else if (ext === "image/png") {
+        } else if (ext.match(".png$")) {
             extStr = ".png"
         }
         cb(null, file.fieldname + '-' + Date.now() + extStr);

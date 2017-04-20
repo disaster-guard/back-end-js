@@ -1,11 +1,12 @@
 {
   "name": "disaster-guard",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "apidoc": "^0.17.5",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",
@@ -18,5 +19,12 @@
     "pug": "~2.0.0-beta11",
     "python-shell": "^0.4.0",
     "serve-favicon": "~2.4.2"
+  },
+  "apidoc": {
+    "name": "Disaster Guard",
+    "version": "0.1.0",
+    "description": "API Documentation for Disaster Guard",
+    "title": "Documentation - Disaster Guard",
+    "url" : "https://api.disasterguard.com"
   }
 }

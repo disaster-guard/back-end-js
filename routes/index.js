@@ -10,6 +10,17 @@ var secret = config.secret;
 // TODO: replace hard-coded UUID with a dynamic UUID functional NPM package
 var tokenValue = "123-456";
 
+/**
+ * @api {post} /register Create new user account in database
+ * @apiName Register
+ * @apiGroup API
+ *
+ * @apiParam {String} name name of user
+ * @apiParam {String} email email of user
+ * @apiParam {String} password password of user
+ *
+ * @apiSuccess {String} message success/failure message if user was created
+ */
 router.post('/register', function(req, res, next) {
   var user = new User();
   console.log(req.body);
@@ -25,6 +36,16 @@ router.post('/register', function(req, res, next) {
   });
 });
 
+/**
+ * @api {post} /oauth Authenticate login for user
+ * @apiName OAuth
+ * @apiGroup API
+ *
+ * @apiParam {String} email email of user
+ * @apiParam {String} password password of user
+ *
+ * @apiSuccess {JSON} session token
+ */
 router.post('/oauth', function(req, res, next) {
   if (secret != req.body.client_secret) {
       res.status(403).send({ error: 'Bad secret' });
@@ -45,6 +66,17 @@ router.post('/oauth', function(req, res, next) {
   }
 });
 
+/**
+ * @api {post} /api/flare Upload user coordinates to database
+ * @apiName Flare
+ * @apiGroup API
+ *
+ * @apiParam {Number} longitude longitude of user
+ * @apiParam {Number} latitude latitude of user
+ * @apiParam {String} user_id user_id of user
+ *
+ * @apiSuccess {JSON} success message.
+ */
 router.post('/api/flare', function(req, res, next) {
     var flare = new Flare();
     flare.longitude = req.body.longitude;
@@ -62,6 +94,15 @@ router.post('/api/flare', function(req, res, next) {
     });
 });
 
+/**
+ * @api {post} /api/getUserId Query for UserId from database
+ * @apiName getUserId
+ * @apiGroup API
+ *
+ * @apiParam {String} email email of user
+ *
+ * @apiSuccess {String} user_id verified userId
+ */
 router.post('/api/getUserId', function(req, res, next) {
     if (req.get("Authorization") !== tokenValue) {
         return res.status(403).send({error: 'Bad auth header'});
@@ -81,6 +122,15 @@ router.post('/api/getUserId', function(req, res, next) {
     });
 });
 
+/**
+ * @api {post} /api/nearbyProfile Handle NearbyAPI requests from client devices
+ * @apiName nearbyProfile
+ * @apiGroup API
+ *
+ * @apiParam {String} email email of user
+ *
+ * @apiSuccess {String} results verified user name and profile picture
+ */
 router.get('/api/nearbyProfile', function(req, res, next) {
     var picture = "http://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg";
     User.findOne({ email: req.param("email") }, function(err, user) {
@@ -98,6 +148,15 @@ router.get('/api/nearbyProfile', function(req, res, next) {
     });
 });
 
+/**
+ * @api {post} /api/uploadPredictionPicture Upload picture and run against facial recognition
+ * @apiName uploadPredictionPicture
+ * @apiGroup API
+ *
+ * @apiParam {File} image image to be evaluated
+ *
+ * @apiSuccess {JSON} matches facial recognition results
+ */
 router.post('/api/uploadPredictionPicture', function(req, res, next) {
     var fileFun = Upload.single('image');
     fileFun(req, res, function (err) {
@@ -105,7 +164,6 @@ router.post('/api/uploadPredictionPicture', function(req, res, next) {
             console.log("FAILED TO UPLOAD!");
             console.log(err);
             res.status(505).send(err);
-            // An error occurred when uploading
         } else {
             console.log("UPLOAD SUCCESS!");
             console.log(req.file); //form files
