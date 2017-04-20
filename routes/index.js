@@ -32,7 +32,7 @@ router.post('/oauth', function(req, res, next) {
     User.findOne({ email: req.body.email }, function(err, user) {
         if (err) throw err;
         if (!user) {
-            res.send("User not found!");
+            res.status(403).send({ error: 'User not found' });
         } else if (user) {
             // check if password matches
             if (user.password != req.body.password) {
@@ -135,7 +135,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-router.post('/upload', upload.single('image'), function(req, res, next) {
+router.post('/api/uploadProductionPicture', upload.single('image'), function(req, res, next) {
     console.log(req.file); //form files
     /* example output:
      { fieldname: 'upl',
