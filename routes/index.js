@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var config = require('../config');
 var PythonShell = require('python-shell');
+var multer = require('multer');
 var User = require('./models/user');
 var Flare = require('./models/position');
 
@@ -110,6 +111,43 @@ router.get('/getPredictionModel', function(req, res, next) {
         if (err) throw err;
         res.json(JSON.parse(results[0]));
     });
+});
+
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './images');
+    },
+    filename: function (req, file, cb) {
+        var ext = file.mimetype;
+        var extStr = "";
+        if (ext === 'image/jpeg') {
+            extStr = ".jpg"
+        } else if (ext === "image/png") {
+            extStr = ".png"
+        }
+        cb(null, file.fieldname + '-' + Date.now() + extStr);
+    },
+    limits: {
+        fileSize: 5242880 // Max upload size of 5MB
+    }
+});
+
+var upload = multer({ storage: storage });
+
+router.post('/upload', upload.single('image'), function(req, res, next) {
+    console.log(req.file); //form files
+    /* example output:
+     { fieldname: 'upl',
+     originalname: 'grumpy.png',
+     encoding: '7bit',
+     mimetype: 'image/png',
+     destination: './uploads/',
+     filename: '436ec561793aa4dc475a88e84776b1b9',
+     path: 'uploads/436ec561793aa4dc475a88e84776b1b9',
+     size: 277056 }
+     */
+    res.status(200).json(req.file);
 });
 
 module.exports = router;
