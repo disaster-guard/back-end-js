@@ -98,25 +98,36 @@ router.get('/api/nearbyProfile', function(req, res, next) {
     });
 });
 
-router.post('/api/uploadPredictionPicture', Upload.single('image') ,function(req, res, next) {
-    console.log(req.file); //form files
-    /* example output:
-     { fieldname: 'image',
-     originalname: 'photo.png',
-     encoding: '7bit',
-     mimetype: 'image/png',
-     destination: './images/',
-     filename: 'image-436ec561793aa4dc475a88e84776b1b9.jpg',
-     path: 'uploads/image-436ec561793aa4dc475a88e84776b1b9.png',
-     size: 277056 }
-     */
-    var options = {
-        mode: 'text',
-        args: [req.file.path, config.clarifaiId, config.clarifaiSecret]
-    };
-    PythonShell.run('predict.py', options, function (err, results) {
-        if (err) throw err;
-        res.status(200).json(JSON.parse(results[0]));
+router.post('/api/uploadPredictionPicture', function(req, res, next) {
+    var fileFun = Upload.single('image');
+    fileFun(req, res, function (err) {
+        if (err) {
+            console.log("FAILED TO UPLOAD!");
+            console.log(err);
+            res.status(505).send(err);
+            // An error occurred when uploading
+        } else {
+            console.log("UPLOAD SUCCESS!");
+            console.log(req.file); //form files
+            /* example output:
+             { fieldname: 'image',
+             originalname: 'photo.png',
+             encoding: '7bit',
+             mimetype: 'image/png',
+             destination: './images/',
+             filename: 'image-436ec561793aa4dc475a88e84776b1b9.jpg',
+             path: 'uploads/image-436ec561793aa4dc475a88e84776b1b9.png',
+             size: 277056 }
+             */
+            var options = {
+                mode: 'text',
+                args: [req.file.path, config.clarifaiId, config.clarifaiSecret]
+            };
+            PythonShell.run('predict.py', options, function (err, results) {
+                if (err) throw err;
+                res.status(200).json(JSON.parse(results[0]));
+            });
+        }
     });
 });
 
