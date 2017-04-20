@@ -98,22 +98,6 @@ router.get('/api/nearbyProfile', function(req, res, next) {
     });
 });
 
-router.get('/getPredictionModel', function(req, res, next) {
-
-    // TODO: get photo based on request's user ID
-    var photoFile = 'photo.jpg';
-
-    var options = {
-        mode: 'text',
-        args: [photoFile, config.clarifaiId, config.clarifaiSecret]
-    };
-    PythonShell.run('predict.py', options, function (err, results) {
-        if (err) throw err;
-        res.json(JSON.parse(results[0]));
-    });
-});
-
-
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './images');
@@ -135,19 +119,26 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-router.post('/api/uploadProductionPicture', upload.single('image'), function(req, res, next) {
+router.post('/api/uploadPredictionPicture', upload.single('image') ,function(req, res, next) {
     console.log(req.file); //form files
     /* example output:
-     { fieldname: 'upl',
-     originalname: 'grumpy.png',
+     { fieldname: 'image',
+     originalname: 'guard.png',
      encoding: '7bit',
      mimetype: 'image/png',
-     destination: './uploads/',
-     filename: '436ec561793aa4dc475a88e84776b1b9',
-     path: 'uploads/436ec561793aa4dc475a88e84776b1b9',
+     destination: './images/',
+     filename: 'image-436ec561793aa4dc475a88e84776b1b9.jpg',
+     path: 'uploads/image-436ec561793aa4dc475a88e84776b1b9.png',
      size: 277056 }
      */
-    res.status(200).json(req.file);
+    var options = {
+        mode: 'text',
+        args: [req.file.path, config.clarifaiId, config.clarifaiSecret]
+    };
+    PythonShell.run('predict.py', options, function (err, results) {
+        if (err) throw err;
+        res.json(JSON.parse(results[0]));
+    });
 });
 
 module.exports = router;
